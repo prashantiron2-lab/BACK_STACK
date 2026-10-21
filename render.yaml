@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: browser-back-stack
+    runtime: node
+    buildCommand: npm install && g++ -std=c++17 -O2 browser_stack.cpp -o browser_stack
+    startCommand: npm start
+    healthCheckPath: /api/health

@@ -1,0 +1,5 @@
+node_modules/
+*.exe
+browser_stack
+*.log
+.DS_Store

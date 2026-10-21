@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stack Browser</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Data Structures Mini Project</p>
+        <h1>Stack Browser</h1>
+        <p class="subtitle">A working model of browser back and forward navigation using C++ stacks.</p>
+      </div>
+      <div class="badge"><span></span> C++ stack engine online</div>
+    </header>
+
+    <section class="browser card">
+      <div class="toolbar">
+        <button id="back" class="icon-button" title="Go back">←</button>
+        <button id="forward" class="icon-button" title="Go forward">→</button>
+        <form id="visitForm">
+          <span class="lock">⌂</span>
+          <input id="pageInput" autocomplete="off" placeholder="Enter a page name or URL" aria-label="Page name or URL">
+          <button class="visit" type="submit">Visit</button>
+        </form>
+      </div>
+      <div class="page-view">
+        <div class="page-icon">◈</div>
+        <p class="eyebrow">Current page</p>
+        <h2 id="currentPage">New tab</h2>
+        <p id="message">Enter a page above to begin browsing.</p>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="stack-card card">
+        <div class="section-heading">
+          <div><p class="eyebrow">LIFO structure</p><h2>Back stack</h2></div>
+          <strong id="backCount">0</strong>
+        </div>
+        <p class="helper">The most recently visited previous page is removed first.</p>
+        <div id="backStack" class="stack-list empty">No previous pages</div>
+      </div>
+      <div class="stack-card card">
+        <div class="section-heading">
+          <div><p class="eyebrow">LIFO structure</p><h2>Forward stack</h2></div>
+          <strong id="forwardCount">0</strong>
+        </div>
+        <p class="helper">A new visit clears this stack, just like a real browser.</p>
+        <div id="forwardStack" class="stack-list empty">No forward pages</div>
+      </div>
+    </section>
+
+    <section class="explain card">
+      <div><p class="eyebrow">How it works</p><h2>Two stacks model navigation</h2></div>
+      <div class="rules">
+        <div><b>Visit</b><span>Current page → Back stack<br>Forward stack → cleared</span></div>
+        <div><b>Back</b><span>Current page → Forward stack<br>Back stack top → current</span></div>
+        <div><b>Forward</b><span>Current page → Back stack<br>Forward stack top → current</span></div>
+      </div>
+    </section>
+
+    <footer><span>Core logic: C++17 with vector-backed stacks</span><span>API: Node.js + Express</span></footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
