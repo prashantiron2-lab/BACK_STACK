@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stack Browser - Project Report</title>
+<style>
+@page { size: A4; margin: 17mm 16mm 16mm; }
+* { box-sizing: border-box; }
+body { margin:0; color:#e7e7e7; background:#090909; font:10.2pt/1.55 "Segoe UI",Arial,sans-serif; }
+h1,h2,h3 { line-height:1.2; }
+h1 { color:#f7f7f0; font:700 34pt/1 "Courier New",monospace; letter-spacing:-2px; margin:0 0 12px; }
+h2 { color:#d8ff58; border-bottom:1px solid #333; font:700 18pt/1.2 "Courier New",monospace; padding-bottom:8px; margin:0 0 17px; }
+h3 { color:#b48cff; font-size:13pt; margin:20px 0 7px; }
+p { margin:7px 0 11px; }
+ul,ol { padding-left:24px; margin-top:5px; }
+li { margin:4px 0; }
+.cover { min-height:250mm; display:flex; flex-direction:column; justify-content:center; padding:22mm; background:linear-gradient(135deg,#030303,#16121f 60%,#202b0c); border:1px solid #303030; }
+.cover .eyebrow { color:#d8ff58; text-transform:uppercase; letter-spacing:2px; font-size:9pt; font-weight:800; }
+.cover h2 { color:#b48cff; border:0; font:400 16pt/1.35 "Segoe UI",Arial,sans-serif; margin:5px 0 50px; max-width:610px; }
+.meta { border-top:1px solid #d8ff58; max-width:560px; padding-top:14px; color:#bcbcbc; }
+.section { page-break-before:always; }
+.lead { color:#bdbdbd; font-size:12pt; }
+.card { background:#151515; border-left:4px solid #d8ff58; padding:12px 15px; margin:13px 0; }
+.grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.stat { background:#171717; border:1px solid #353535; padding:12px; min-height:68px; }
+.stat strong { display:block; color:#d8ff58; font:700 17pt "Courier New",monospace; margin-bottom:4px; }
+.flow { display:flex; align-items:stretch; gap:7px; margin:18px 0; }
+.flow div { flex:1; background:#18131f; border:1px solid #644c91; padding:10px; text-align:center; }
+.flow b { align-self:center; color:#d8ff58; font-size:18px; }
+table { border-collapse:collapse; width:100%; margin:10px 0 17px; }
+th { color:#050505; background:#d8ff58; text-align:left; }
+td,th { border:1px solid #393939; padding:7px 8px; vertical-align:top; }
+tr:nth-child(even) td { background:#121212; }
+pre { white-space:pre-wrap; background:#030303; border:1px solid #303030; border-radius:5px; color:#d8ff58; padding:13px; font:8pt/1.45 Consolas,"Courier New",monospace; }
+code { color:#d8ff58; font-family:Consolas,monospace; }
+.q { border:1px solid #343434; border-left:3px solid #b48cff; background:#121212; padding:10px 13px; margin:10px 0; page-break-inside:avoid; }
+.q strong { color:#b48cff; }
+.caption { color:#969696; font-size:9pt; text-align:center; }
+img { max-width:100%; display:block; margin:12px auto; border:1px solid #444; }
+.toc li { margin:7px 0; }
+.small { color:#999; font-size:9pt; }
+.page-note { border-top:1px solid #333; color:#909090; font-size:9pt; margin-top:20px; padding-top:7px; }
+</style>
+</head>
+<body>
+<section class="cover">
+  <div class="eyebrow">Data Structures Mini Project</div>
+  <h1>STACK BROWSER</h1>
+  <h2>Implementation of a basic version of a web browser's back button functionality using Stack</h2>
+  <p class="lead">An interactive full-stack demonstration where the browser history state is managed by a C++ stack engine and displayed through a web interface.</p>
+  <div class="meta">
+    <p><strong>Core concept:</strong> LIFO stacks and browser navigation history</p>
+    <p><strong>Technology:</strong> C++17, Node.js, Express, HTML, CSS, JavaScript, Render</p>
+    <p><strong>Repository:</strong> github.com/prashantiron2-lab/BACK_STACK</p>
+  </div>
+</section>
+
+<section class="section">
+<h2>1. Project Overview</h2>
+<p class="lead">Stack Browser models the behavior of a web browser's Back and Forward buttons with two last-in-first-out stacks.</p>
+<p>When a user visits pages, the current page is stored in a history stack. Pressing Back moves the current page to a forward stack and restores the most recently visited previous page. Pressing Forward reverses that operation. A new page visit after going back clears the forward history, matching the normal behavior of a browser.</p>
+<div class="grid">
+  <div class="stat"><strong>C++17</strong>Core engine</div>
+  <div class="stat"><strong>2</strong>LIFO stacks</div>
+  <div class="stat"><strong>REST</strong>API bridge</div>
+  <div class="stat"><strong>Dark</strong>Interactive UI</div>
+</div>
+<h3>Objectives</h3>
+<ul>
+  <li>Apply the stack data structure to a real-world browser navigation problem.</li>
+  <li>Implement all navigation state transitions in C++.</li>
+  <li>Provide an interactive frontend that makes the stack operations visible.</li>
+  <li>Connect a compiled C++ program to a Node.js web server.</li>
+  <li>Validate user input and return clear operation status messages.</li>
+  <li>Deploy the project as a shareable web application.</li>
+</ul>
+<h3>What the project does and does not do</h3>
+<p>The project simulates navigation history using page names or URLs. It does not load external websites or replace the browser's native navigation. Its purpose is to demonstrate the underlying data structure and its operations clearly.</p>
+</section>
+
+<section class="section">
+<h2>2. Main Idea: Two Stacks</h2>
+<div class="flow">
+  <div>Back stack<br><small>Previous pages</small></div><b>↔</b>
+  <div>Current page<br><small>Active state</small></div><b>↔</b>
+  <div>Forward stack<br><small>Restored pages</small></div>
+</div>
+<h3>Visit operation</h3>
+<p>If the current page is <code>A</code> and the user visits <code>B</code>, page <code>A</code> is pushed onto the back stack. Page <code>B</code> becomes current. The forward stack is cleared because the user has created a new navigation branch.</p>
+<pre>Before: current = A, back = [...], forward = [C, D]
+Visit B:
+        back.push(A)
+        current = B
+        forward.clear()
+After:  current = B, back = [..., A], forward = []</pre>
+<h3>Back operation</h3>
+<p>If the current page is <code>B</code> and the back stack top is <code>A</code>, the current page is pushed onto the forward stack. Then <code>A</code> is popped from the back stack and becomes current.</p>
+<pre>Before: current = B, back = [..., A], forward = []
+Back:
+        forward.push(B)
+        current = back.top()
+        back.pop()
+After:  current = A, back = [...], forward = [B]</pre>
+<h3>Forward operation</h3>
+<p>Forward is the reverse transition. The current page is pushed onto the back stack, then the top item of the forward stack becomes current.</p>
+</section>
+
+<section class="section">
+<h2>3. System Architecture</h2>
+<div class="flow">
+  <div>Frontend<br><small>HTML/CSS/JS</small></div><b>→</b>
+  <div>Express API<br><small>Validation</small></div><b>→</b>
+  <div>C++ engine<br><small>Stack state</small></div><b>→</b>
+  <div>JSON result<br><small>Updated UI</small></div>
+</div>
+<h3>Request lifecycle</h3>
+<ol>
+  <li>The user enters a page name or URL and clicks <strong>Visit</strong>, or clicks Back/Forward.</li>
+  <li>The frontend sends the current page and both stack arrays to <code>POST /api/browser/action</code>.</li>
+  <li>The Express server validates the action, current page, URL, and stack items.</li>
+  <li>The server serializes the arrays with a delimiter and starts the C++ executable using <code>execFile</code>.</li>
+  <li>The C++ program reconstructs the state, applies the requested stack operation, and writes JSON to standard output.</li>
+  <li>Express parses the JSON and returns it to the browser.</li>
+  <li>The frontend replaces its state and redraws the current page and stack panels.</li>
+</ol>
+<table><tr><th>Layer</th><th>Files</th><th>Purpose</th></tr>
+<tr><td>Core logic</td><td><code>browser_stack.cpp</code></td><td>State model, stack operations, input handling, JSON serialization.</td></tr>
+<tr><td>Server</td><td><code>src/index.js</code></td><td>Static hosting, API validation, C++ compilation and execution.</td></tr>
+<tr><td>Frontend</td><td><code>public/index.html</code></td><td>Browser-style layout, controls, and stack containers.</td></tr>
+<tr><td>Styling</td><td><code>public/styles.css</code></td><td>Black theme, lime/violet accents, responsive layout.</td></tr>
+<tr><td>Interaction</td><td><code>public/app.js</code></td><td>Fetch requests, state updates, rendering, HTML escaping.</td></tr>
+<tr><td>Deployment</td><td><code>render.yaml</code></td><td>Render build command, start command, and health endpoint.</td></tr>
+</table>
+</section>
+
+<section class="section">
+<h2>4. C++ Core Code: Data Model</h2>
+<p>The complete algorithmic behavior is implemented in <code>browser_stack.cpp</code> using standard C++17 libraries.</p>
+<pre>#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+struct BrowserState {
+    std::string current;
+    std::vector&lt;std::string&gt; backStack;
+    std::vector&lt;std::string&gt; forwardStack;
+};</pre>
+<h3>BrowserState</h3>
+<p><code>BrowserState</code> groups all navigation information into one object. <code>current</code> stores the active page. <code>backStack</code> stores pages that can be reached with Back. <code>forwardStack</code> stores pages that can be reached with Forward.</p>
+<p>The two vectors are used as stacks. <code>push_back()</code> adds a page to the top, <code>back()</code> reads the top, and <code>pop_back()</code> removes the top. These operations provide LIFO behavior.</p>
+<h3>Why two stacks are necessary</h3>
+<p>One stack alone can remember previous pages, but it cannot support moving forward after a Back action. The second stack preserves the pages temporarily removed from the back stack. Each navigation direction has its own history.</p>
+<table><tr><th>Variable</th><th>Type</th><th>Meaning</th></tr>
+<tr><td><code>current</code></td><td><code>std::string</code></td><td>Page currently displayed.</td></tr>
+<tr><td><code>backStack</code></td><td><code>vector&lt;string&gt;</code></td><td>Previous pages; last element is the Back top.</td></tr>
+<tr><td><code>forwardStack</code></td><td><code>vector&lt;string&gt;</code></td><td>Pages available after Back; last element is the Forward top.</td></tr>
+</table>
+</section>
+
+<section class="section">
+<h2>5. C++ Core Code: State Parsing and Output</h2>
+<h3>Parsing stack values</h3>
+<pre>std::vector&lt;std::string&gt; split(const std::string&amp; value) {
+    std::vector&lt;std::string&gt; result;
+    std::string item;
+    for (char character : value) {
+        if (character == '|') {
+            if (!item.empty()) result.push_back(item);
+            item.clear();
+        } else {
+            item += character;
+        }
+    }
+    if (!item.empty()) result.push_back(item);
+    return result;
+}</pre>
+<p>The API passes a stack as a pipe-separated string such as <code>Home|About|Contact</code>. The <code>split</code> function scans one character at a time. On a pipe, the completed item is added to the vector and the temporary string is reset. The final item is added after the loop.</p>
+<p>The server rejects page names containing a pipe, so the delimiter cannot make the state ambiguous.</p>
+<h3>Safe JSON string output</h3>
+<pre>std::string escapeJson(const std::string&amp; value) {
+    std::string escaped;
+    for (char character : value) {
+        if (character == '\\' || character == '"') escaped += '\\';
+        escaped += character;
+    }
+    return escaped;
+}</pre>
+<p>Page names can contain characters that have a special meaning in JSON. This function adds a backslash before backslashes and double quotes so the generated JSON remains valid.</p>
+<h3>Printing arrays</h3>
+<pre>void printArray(const std::vector&lt;std::string&gt;&amp; values) {
+    std::cout &lt;&lt; "[";
+    for (size_t i = 0; i &lt; values.size(); i++) {
+        if (i &gt; 0) std::cout &lt;&lt; ",";
+        std::cout &lt;&lt; "\"" &lt;&lt; escapeJson(values[i]) &lt;&lt; "\"";
+    }
+    std::cout &lt;&lt; "]";
+}</pre>
+<p><code>printArray</code> serializes a C++ vector into a JSON array. The comma condition prevents a trailing comma, which would make the JSON invalid.</p>
+</section>
+
+<section class="section">
+<h2>6. C++ Core Code: Main Function</h2>
+<pre>int main(int argc, char* argv[]) {
+    if (argc &lt; 5) {
+        std::cerr &lt;&lt; "Usage: browser_stack action current "
+                  &lt;&lt; "backStack forwardStack [url]\n";
+        return 1;
+    }
+
+    const std::string action = argv[1];
+    BrowserState state{argv[2], split(argv[3]), split(argv[4])};
+    const std::string url = argc &gt; 5 ? argv[5] : "";
+    std::string message;</pre>
+<p>The program receives the action and the serialized state as command-line arguments. At least four arguments after the executable are required: action, current page, back stack, and forward stack. A URL argument is needed only for a Visit operation.</p>
+<h3>Visit branch</h3>
+<pre>if (action == "visit") {
+    if (url.empty()) {
+        std::cerr &lt;&lt; "A URL is required for visit.\n";
+        return 1;
+    }
+    if (!state.current.empty()) state.backStack.push_back(state.current);
+    state.current = url;
+    state.forwardStack.clear();
+    message = "Visited a new page. Forward history was cleared.";
+}</pre>
+<p>The current page is pushed before replacement, except when the application is on the initial empty tab. Clearing <code>forwardStack</code> is essential: a new visit creates a new history branch, so old forward pages are no longer reachable through normal browser navigation.</p>
+<h3>Back branch</h3>
+<pre>else if (action == "back") {
+    if (state.backStack.empty()) {
+        message = "Back stack is empty.";
+    } else {
+        state.forwardStack.push_back(state.current);
+        state.current = state.backStack.back();
+        state.backStack.pop_back();
+        message = "Moved to the previous page.";
+    }
+}</pre>
+<p>The empty check prevents an invalid pop. For a valid Back operation, the current page is preserved in the forward stack, then the back-stack top becomes current and is removed.</p>
+<h3>Forward branch</h3>
+<pre>else if (action == "forward") {
+    if (state.forwardStack.empty()) {
+        message = "Forward stack is empty.";
+    } else {
+        state.backStack.push_back(state.current);
+        state.current = state.forwardStack.back();
+        state.forwardStack.pop_back();
+        message = "Moved to the next page.";
+    }
+}</pre>
+<p>Forward performs the mirror image of Back. The current page goes back into the back stack, and the forward top becomes current.</p>
+</section>
+
+<section class="section">
+<h2>7. C++ Core Code: JSON Result</h2>
+<pre>std::cout &lt;&lt; "{\"current\":\"" &lt;&lt; escapeJson(state.current)
+          &lt;&lt; "\",\"backStack\":";
+printArray(state.backStack);
+std::cout &lt;&lt; ",\"forwardStack\":";
+printArray(state.forwardStack);
+std::cout &lt;&lt; ",\"message\":\"" &lt;&lt; escapeJson(message)
+          &lt;&lt; "\"}\n";</pre>
+<p>After the selected operation, the program prints one complete JSON object. The server reads this standard output and parses it. This keeps the C++ engine independent of the browser while providing a simple integration boundary.</p>
+<h3>Response example</h3>
+<pre>{
+  "current": "About",
+  "backStack": ["Home"],
+  "forwardStack": [],
+  "message": "Visited a new page. Forward history was cleared."
+}</pre>
+<h3>Invalid actions</h3>
+<pre>else {
+    std::cerr &lt;&lt; "Unknown action.\n";
+    return 1;
+}</pre>
+<p>Only <code>visit</code>, <code>back</code>, and <code>forward</code> are accepted. An unknown action causes a non-zero process exit so the server can report an engine failure instead of returning a false success.</p>
+</section>
+
+<section class="section">
+<h2>8. Algorithm Analysis</h2>
+<table><tr><th>Operation</th><th>Stack work</th><th>Time complexity</th><th>Effect</th></tr>
+<tr><td>Visit</td><td>push + clear</td><td>O(F) with vector clear</td><td>Stores current page and removes forward history.</td></tr>
+<tr><td>Back</td><td>push + top + pop</td><td>O(1)</td><td>Moves one page from back history to current and current to forward.</td></tr>
+<tr><td>Forward</td><td>push + top + pop</td><td>O(1)</td><td>Moves one page from forward history to current and current to back.</td></tr>
+</table>
+<p>Here, <code>F</code> is the number of entries in the forward stack. The project uses <code>clear()</code> for a new visit, so clearing the forward vector is linear in its current size. Back and Forward are constant-time stack operations.</p>
+<h3>Space complexity</h3>
+<p>If there are <code>N</code> distinct stored history entries, the combined space used by the back and forward stacks is O(N). The current page uses O(1) additional space apart from its string length.</p>
+<h3>Why LIFO matches browser navigation</h3>
+<p>Back always returns to the most recently visited page that has not already been removed. That is exactly the Last-In-First-Out rule. The latest page is the first page removed, making a stack the natural data structure.</p>
+</section>
+
+<section class="section">
+<h2>9. Express Backend</h2>
+<h3>Server setup</h3>
+<pre>const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const { execFile, execFileSync } = require('child_process');
+
+const app = express();
+const port = process.env.PORT || 3000;
+const root = path.join(__dirname, '..');</pre>
+<p>Express provides the HTTP server. CORS allows browser requests when the frontend and API are hosted separately. Path utilities create platform-independent paths. The child-process functions compile and execute the C++ engine.</p>
+<h3>Static frontend hosting</h3>
+<pre>app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(root, 'public')));</pre>
+<p>JSON middleware parses request bodies. Static middleware serves the HTML, CSS, and JavaScript files. This means one Render web service hosts both the API and the interface.</p>
+<h3>Automatic C++ compilation</h3>
+<pre>function ensureEngine() {
+    if (fs.existsSync(executable)) return;
+    try {
+        execFileSync('g++', [
+            '-std=c++17', '-O2', source, '-o', executable
+        ], { stdio: 'pipe' });
+    } catch (error) {
+        throw new Error('The C++ stack engine could not be compiled.');
+    }
+}</pre>
+<p>The server checks for the executable before every operation. In deployment, Render compiles it during the build command, while this fallback also allows a fresh local checkout to work automatically when a compiler is installed.</p>
+</section>
+
+<section class="section">
+<h2>10. API Validation and C++ Bridge</h2>
+<h3>Request validation</h3>
+<pre>const { action, current = '', backStack = [],
+        forwardStack = [], url = '' } = request.body || {};
+
+if (!['visit', 'back', 'forward'].includes(action)) {
+    return response.status(400).json({
+        error: 'Action must be visit, back, or forward.'
+    });
+}</pre>
+<p>The server rejects actions outside the supported set. Visit also requires a non-empty page name or URL, and the current page must be a valid string. Stack items are filtered so only non-empty strings without the pipe delimiter reach the C++ process.</p>
+<h3>Executing the C++ engine</h3>
+<pre>const argumentsList = [
+    action,
+    current,
+    cleanItems(backStack).join('|'),
+    cleanItems(forwardStack).join('|'),
+];
+if (action === 'visit') argumentsList.push(url.trim());
+
+execFile(executable, argumentsList, { maxBuffer: 1024 * 1024 },
+    (error, stdout, stderr) =&gt; {
+        if (error) return response.status(500).json({
+            error: 'The C++ stack engine failed.'
+        });
+        return response.json(JSON.parse(stdout));
+    });</pre>
+<p><code>execFile</code> passes arguments without invoking a shell, which is safer and avoids command-string parsing problems. The response is returned only after valid JSON has been parsed.</p>
+<h3>Health endpoint</h3>
+<pre>app.get('/api/health', (request, response) =&gt; {
+    response.json({
+        status: 'OK',
+        message: 'C++ browser stack engine is running'
+    });
+});</pre>
+<p>Render uses this endpoint to determine whether the deployed service is healthy.</p>
+</section>
+
+<section class="section">
+<h2>11. Frontend Implementation</h2>
+<h3>Client state</h3>
+<pre>const state = {
+    current: '',
+    backStack: [],
+    forwardStack: []
+};</pre>
+<p>The browser maintains a local copy of the latest C++ result so it can send complete state on the next action. The source of truth for each transition remains the C++ executable.</p>
+<h3>Rendering stack entries</h3>
+<pre>function renderStack(elementId, items, label) {
+    const element = document.querySelector(`#${elementId}`);
+    element.classList.toggle('empty', items.length === 0);
+    if (items.length === 0) {
+        element.textContent = `No ${label} pages`;
+        return;
+    }
+    element.innerHTML = items.map((item, index) =&gt;
+        `&lt;div class="stack-item"&gt;
+          &lt;span&gt;${escapeHtml(item)}&lt;/span&gt;
+          &lt;small&gt;${index === items.length - 1 ? 'TOP' : ''}&lt;/small&gt;
+        &lt;/div&gt;`
+    ).join('');
+}</pre>
+<p>The last item is labeled TOP because the C++ vector uses its last element as the stack top. Empty stacks receive a clear empty-state message.</p>
+<h3>HTML escaping</h3>
+<pre>function escapeHtml(value) {
+    return value.replace(/[&lt;&gt;"']/g, character =&gt; ({
+        '&amp;': '&amp;amp;', '&lt;': '&amp;lt;', '&gt;': '&amp;gt;',
+        '"': '&amp;quot;', "'": '&amp;#039;'
+    }[character]));
+}</pre>
+<p>Page names are user input. Escaping before assigning them to <code>innerHTML</code> prevents a page name from being interpreted as HTML.</p>
+<h3>Calling the API</h3>
+<pre>const response = await fetch('/api/browser/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...state, action, url })
+});
+const result = await response.json();</pre>
+<p>After a successful response, the client replaces its current page and both arrays with the returned C++ state. The UI then redraws button disabled states, counts, and stack cards.</p>
+</section>
+
+<section class="section">
+<h2>12. User Interface Design</h2>
+<p>The interface uses a black theme designed specifically for this project. It is intentionally different from the DFS Maze Lab visual language.</p>
+<ul>
+  <li>Black and charcoal surfaces represent the browser and stack panels.</li>
+  <li>Electric lime indicates actions, active stack tops, and system information.</li>
+  <li>Violet identifies the current-page and explanatory elements.</li>
+  <li>Pink is used for the visit action and status emphasis.</li>
+  <li>Monospace headings support the technical stack-machine concept.</li>
+  <li>The layout adapts to narrow screens by stacking controls vertically.</li>
+</ul>
+<img src="report-assets/stack-browser.png" alt="Stack Browser interface">
+<p class="caption">Figure 1. Interactive Stack Browser interface with current page, Back stack, and Forward stack.</p>
+<h3>User interaction sequence</h3>
+<ol>
+  <li>Enter <code>Home</code> and click Visit.</li>
+  <li>Enter <code>About</code> and click Visit.</li>
+  <li>Enter <code>Contact</code> and click Visit.</li>
+  <li>Click Back: Contact moves to Forward, About becomes current.</li>
+  <li>Click Back again: About moves to Forward, Home becomes current.</li>
+  <li>Click Forward: About is restored.</li>
+  <li>Visit a new page: the Forward stack is cleared.</li>
+</ol>
+</section>
+
+<section class="section">
+<h2>13. Technology Stack and Repository</h2>
+<table><tr><th>Technology</th><th>Use</th></tr>
+<tr><td>C++17</td><td>Browser history state transitions and stack data structure.</td></tr>
+<tr><td>GNU g++</td><td>Compiles <code>browser_stack.cpp</code>.</td></tr>
+<tr><td>Node.js</td><td>Runtime for the web server.</td></tr>
+<tr><td>Express.js</td><td>API routes and static frontend hosting.</td></tr>
+<tr><td>HTML5</td><td>Semantic interface structure and forms.</td></tr>
+<tr><td>CSS3</td><td>Black theme, responsive layout, and visual states.</td></tr>
+<tr><td>JavaScript</td><td>API calls, state synchronization, and DOM rendering.</td></tr>
+<tr><td>Render</td><td>Cloud deployment and health monitoring.</td></tr>
+<tr><td>GitHub</td><td>Source control and deployment source.</td></tr>
+</table>
+<h3>Repository structure</h3>
+<pre>browser-back-stack-project/
+├── browser_stack.cpp       # Main C++ stack engine
+├── src/index.js            # Express server and API bridge
+├── public/
+│   ├── index.html           # Browser-style interface
+│   ├── styles.css           # Black theme
+│   └── app.js               # Frontend state and actions
+├── render.yaml              # Deployment configuration
+├── package.json             # Scripts and dependencies
+└── README.md                # Setup documentation</pre>
+</section>
+
+<section class="section">
+<h2>14. Local Run and Deployment</h2>
+<h3>Run locally</h3>
+<pre>cd D:\c++\browser-back-stack-project
+npm install
+npm start</pre>
+<p>Open <code>http://localhost:3000</code>. If port 3000 is already occupied, choose another port:</p>
+<pre>$env:PORT="3220"
+npm start</pre>
+<h3>Direct C++ compilation</h3>
+<pre>g++ -std=c++17 -O2 browser_stack.cpp -o browser_stack.exe</pre>
+<h3>Render configuration</h3>
+<pre>services:
+  - type: web
+    name: browser-back-stack
+    runtime: node
+    buildCommand: npm install &amp;&amp; g++ -std=c++17 -O2 browser_stack.cpp -o browser_stack
+    startCommand: npm start
+    healthCheckPath: /api/health</pre>
+<p>No environment variables are required. Render installs the Node dependencies, compiles the C++ engine, starts the Express server, and checks <code>/api/health</code>.</p>
+<h3>Deployment repository</h3>
+<p>The source is pushed to <code>https://github.com/prashantiron2-lab/BACK_STACK</code> on the <code>main</code> branch. Render can deploy directly from this repository.</p>
+</section>
+
+<section class="section">
+<h2>15. Testing and Verification</h2>
+<table><tr><th>Test</th><th>Expected result</th><th>Result</th></tr>
+<tr><td>Compile C++ engine</td><td>Executable created without compiler errors.</td><td>Passed</td></tr>
+<tr><td>Visit Home from empty state</td><td>Current page becomes Home; stacks remain empty.</td><td>Passed</td></tr>
+<tr><td>Visit About after Home</td><td>Home is pushed to Back.</td><td>Passed</td></tr>
+<tr><td>Back from About</td><td>About moves to Forward; Home becomes current.</td><td>Passed</td></tr>
+<tr><td>Forward from Home</td><td>Home moves to Back; About becomes current.</td><td>Passed</td></tr>
+<tr><td>Visit after Back</td><td>Forward stack is cleared.</td><td>Passed</td></tr>
+<tr><td>Back on empty stack</td><td>State stays safe and message is returned.</td><td>Passed</td></tr>
+<tr><td>Forward on empty stack</td><td>State stays safe and message is returned.</td><td>Passed</td></tr>
+<tr><td>Invalid API action</td><td>HTTP 400 validation response.</td><td>Implemented</td></tr>
+<tr><td>Homepage and health endpoint</td><td>HTTP 200 response.</td><td>Verified locally</td></tr>
+</table>
+<h3>Example tested sequence</h3>
+<pre>Visit Home       current=Home,    back=[],           forward=[]
+Visit About      current=About,   back=[Home],       forward=[]
+Back             current=Home,    back=[],           forward=[About]
+Forward          current=About,   back=[Home],       forward=[]</pre>
+</section>
+
+<section class="section">
+<h2>16. Viva and Technical Questions</h2>
+<p>The following questions and answers summarize the implementation and concepts used in the project.</p>
+<div class="q"><strong>Q1. Why are two stacks used?</strong><br>One stack stores pages available through Back and the other stores pages available through Forward. A single stack cannot preserve both directions after a Back operation.</div>
+<div class="q"><strong>Q2. What is the principle of a stack?</strong><br>A stack follows LIFO: Last In, First Out. The last item inserted is the first item removed.</div>
+<div class="q"><strong>Q3. What is the stack top in this implementation?</strong><br>The top is the last element of each C++ vector. It is accessed with <code>back()</code> and removed with <code>pop_back()</code>.</div>
+<div class="q"><strong>Q4. What happens when a new page is visited after Back?</strong><br>The current page is pushed to the back stack, the new page becomes current, and the forward stack is cleared. This matches browser history behavior.</div>
+<div class="q"><strong>Q5. What happens when the Back stack is empty?</strong><br>No pop is attempted. The state remains unchanged and the engine returns the message “Back stack is empty.”</div>
+<div class="q"><strong>Q6. What happens when the Forward stack is empty?</strong><br>No forward operation is performed. The state remains unchanged and the engine reports that the Forward stack is empty.</div>
+<div class="q"><strong>Q7. What is the time complexity of Back and Forward?</strong><br>Both are O(1), because vector top access, push_back, and pop_back operate at the end of the vector.</div>
+<div class="q"><strong>Q8. What is the time complexity of Visit?</strong><br>The push is O(1), but clearing the forward stack is O(F), where F is the number of forward entries.</div>
+<div class="q"><strong>Q9. What is the space complexity?</strong><br>O(N), where N is the total number of stored history entries in the two stacks.</div>
+<div class="q"><strong>Q10. Why use vector instead of a custom array stack?</strong><br><code>std::vector</code> provides dynamic storage and efficient end operations while still clearly demonstrating stack behavior through LIFO methods. A custom stack class could be substituted without changing the algorithm.</div>
+<div class="q"><strong>Q11. Why is the core logic written in C++?</strong><br>The project requirement is to demonstrate the Stack data structure in C++. The web layer is only an interface and integration layer; state transitions remain in the C++ engine.</div>
+<div class="q"><strong>Q12. How does JavaScript communicate with C++?</strong><br>JavaScript sends a POST request to Express. Express passes the state to the compiled C++ executable as command-line arguments. C++ returns JSON through standard output, which Express sends back to JavaScript.</div>
+<div class="q"><strong>Q13. Why is JSON used?</strong><br>JSON is a simple language-independent format that can represent the current page, both arrays, and a status message. It is directly supported by Node.js and browser JavaScript.</div>
+<div class="q"><strong>Q14. Why is HTML escaping included?</strong><br>Page names are user input and are displayed in the DOM. Escaping prevents input such as HTML markup from being interpreted as executable page content.</div>
+<div class="q"><strong>Q15. Why does Render need a health-check path?</strong><br>Render uses <code>/api/health</code> to confirm that the Node server has started and is responding correctly.</div>
+<div class="q"><strong>Q16. Does this project browse real websites?</strong><br>No. It is an educational simulation of history navigation. The entered page name or URL is treated as a history label.</div>
+<div class="q"><strong>Q17. What is the difference between Back and Forward?</strong><br>Back pops from the back stack and pushes current to forward. Forward pops from the forward stack and pushes current to back. They are inverse state transitions.</div>
+<div class="q"><strong>Q18. How can this be extended?</strong><br>Possible extensions include browser tabs, a custom linked-list stack, page timestamps, history limits, persistent storage, real URL previews, and keyboard shortcuts.</div>
+</section>
+
+<section class="section">
+<h2>17. Conclusion</h2>
+<p>Stack Browser demonstrates how a simple abstract data type can model a familiar software feature. The two-stack design is small, efficient, and directly explains the behavior of Back and Forward navigation.</p>
+<p>The project also shows how C++ algorithmic logic can be integrated into a web application without rewriting the core logic in JavaScript. Express provides the bridge, the frontend makes the state visible, and Render provides a public deployment path.</p>
+<div class="card"><strong>Central result:</strong> every navigation action is a controlled LIFO state transition, implemented in C++ and visualized interactively through the browser interface.</div>
+<p class="page-note">Repository: github.com/prashantiron2-lab/BACK_STACK</p>
+</section>
+</body>
+</html>
